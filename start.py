@@ -1,4 +1,4 @@
-# import the colorama library
+# import the colorama librarye
 import os
 from sys import path as syspath
 syspath.append(os.path.join(os.path.dirname(__file__), "./lib/colorama"))
