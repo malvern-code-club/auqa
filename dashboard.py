@@ -13,7 +13,7 @@ app = Flask(__name__)
 @app.route("/")
 def dashboard():
     # get latest result from database to display on dashboard
-    c.execute("SELECT temperature, pressure, humidity, timestamp, soil_humidity FROM `data` ORDER BY timestamp DESC LIMIT 1")
+    c.execute("SELECT temperature, pressure, humidity, timestamp, soil_humidity, image FROM `data` ORDER BY timestamp DESC LIMIT 1")
     current = c.fetchone()
     # get all results from the last day to put in the charts
     c.execute("SELECT temperature, pressure, humidity, timestamp, soil_humidity FROM `data` WHERE timestamp >= datetime('now', '-1 day') ORDER BY timestamp ASC")
