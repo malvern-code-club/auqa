@@ -11,7 +11,7 @@ def log(message):
 
 def Capture(name):
     if os.environ["TEST"] != "y":
-        camera.capture(name)
+        camera.capture("assets/img/" + name)
     else:
         log("== TAKE PICTURE ==")
 
