@@ -41,6 +41,10 @@ def send_css(path):
 def send_fonts(path):
     return send_from_directory("assets/fonts", path)
 
+@app.route("/assets/img/<path:path>") # serve files from the images folder
+def send_images(path):
+    return send_from_directory("assets/img", path)
+
 def log(message):
     ts = time.time()
     st = datetime.datetime.fromtimestamp(ts).strftime('%H:%M:%S %d/%m/%Y')

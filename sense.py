@@ -85,7 +85,8 @@ def go():
         c.execute("SELECT * FROM data WHERE id=?", [rowid])
         soil_humidity = c.fetchall()
         soil_humidity = soil_humidity[0][5]
-        if soil_humidity > 900:
+        # Digital: 1 = water, 0 = Good
+        if soil_humidity >= 1: # Digital
             water()
         else:
             log("Not watering plant because not over threshold")
