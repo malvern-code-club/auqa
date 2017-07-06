@@ -8,25 +8,26 @@ import time
 import datetime
 import random
 
-from camera import Capture
+import camera
 
 conn = sqlite3.connect("database.db", check_same_thread=False) #SQLite3 Setup
 c = conn.cursor() #SQL Cursor
 
 c.execute("""CREATE TABLE IF NOT EXISTS `data` (
-	`id`	INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-	`timestamp`	DATE NOT NULL DEFAULT (datetime('now','localtime')),
-	`humidity`	REAL,
+	`id`	        INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+	`timestamp`	    DATE NOT NULL DEFAULT (datetime('now','localtime')),
+	`humidity`	    REAL,
 	`temperature`	REAL,
-	`pressure`	REAL,
-	`soil_humidity` REAL
+	`pressure`	    REAL,
+	`soil_humidity` REAL,
+    `image`,        TEXT
 );""")
 
 conn.commit()
 
 c.execute("""CREATE TABLE IF NOT EXISTS `options` (
-        `name` TEXT,
-	`value`	TEXT
+    `name`          TEXT,
+	`value`	        TEXT
 );""")
 
 conn.commit()
@@ -36,7 +37,8 @@ if os.environ["TEST"] != "y":
     s = SenseHat() #Sensehat Setup
 
     GPIO.setmode(GPIO.BCM)
-    GPIO.setup(17, GPIO.IN)
+    GPIO.setup(17, GPIO.IN) # Soil Sensor
+    GPIO.setup(18, GPIO.OUT) # Pump
 else:
     s = None
 
@@ -59,16 +61,18 @@ def get_data(): #Get humidity and temperature
     log("-----------------------------------------")
     log("Current Soil Humidity: " + str(soil_humidity))
 
-    insert_data(humidity, temp, pressure, soil_humidity)
-
     ts = time.time()
 
     st = datetime.datetime.fromtimestamp(ts).strftime('%H-%M-%S-%d')
 
-    Capture(st + ".jpg")
+    filename = st+".jpg"
 
-def insert_data(humidity, temperature, pressure, soil_humidity): # Put data into the database
-    c.execute("INSERT INTO `data` (humidity, temperature, pressure, soil_humidity) VALUES (?, ?, ?, ?)", [humidity, temperature, pressure, soil_humidity])
+    camera.Capture(filename)
+
+    insert_data(humidity, temp, pressure, soil_humidity, filename)
+
+def insert_data(humidity, temperature, pressure, soil_humidity, filename): # Put data into the database
+    c.execute("INSERT INTO `data` (humidity, temperature, pressure, soil_humidity, image) VALUES (?, ?, ?, ?, ?)", [humidity, temperature, pressure, soil_humidity, filename])
     conn.commit()
     return c.lastrowid
 
@@ -97,4 +101,9 @@ def log(message):
     print("[" + st + "] ", message)
 
 def water():
+    log("== Watering for 5s... ==")
+    if os.environ["TEST"] != "y":
+        GPIO.output(18, GPIO.HIGH)
+        time.sleep(5)
+        GPIO.output(18, GPIO.LOW)
     log("== Watered Plant ==")
