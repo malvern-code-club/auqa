@@ -37,6 +37,17 @@
   <div class="container">
     <div class="row">
 
+      <!-- Picture Card -->
+      <div class="col-md-4" style="padding-bottom: .5em;">
+        <div class="card">
+          <!-- Temperature Card Image -->
+          <img class="card-img-top img-fluid" src="/assets/img/{{ current[5] }}" alt="Card image cap">
+          <div class="card-block">
+            <h4 class="card-title">Image</h4>
+          </div>
+        </div>
+      </div>
+
       <!-- Temperature Card -->
       <div class="col-md-4" style="padding-bottom: .5em;">
         <div class="card">
@@ -76,6 +87,18 @@
           </div>
         </div>
       </div>
+
+      <div class="col-md-4" style="padding-bottom: .5em;">
+        <div class="card">
+          <img class="card-img-top img-fluid" src="http://www.goodwp.com/images/201301/goodwp.com_27257.jpg" alt="Card image cap">
+          <div class="card-block">
+            <h4 class="card-title">Soil Humidity</h4>
+            <p class="card-text">The plant's soil humidity is currently {{ current[4] | round(precision=2) }}.</p>
+            <canvas id="soil-humidity-chart"></canvas>
+            <!--<a href="#" class="btn btn-primary">Humidity</a>-->
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </div>
@@ -88,6 +111,7 @@
   var tempCtx = document.getElementById("temperature-chart").getContext("2d");
   var pressureCtx = document.getElementById("pressure-chart").getContext("2d");
   var humidityCtx = document.getElementById("humidity-chart").getContext("2d");
+  var soilHumidityCtx = document.getElementById("soil-humidity-chart").getContext("2d");
 
   // setup chart
   var tempChart = new Chart(tempCtx, {
@@ -163,6 +187,39 @@
         datasets: [{
             label: 'Humidity (%)',
             data: [{% for item in history %}{{ item[2] | round(precision=3) }},{% endfor %}],
+            borderColor: [
+                'rgba(255,99,132,1)',
+                'rgba(54, 162, 235, 1)',
+                'rgba(255, 206, 86, 1)',
+                'rgba(75, 192, 192, 1)',
+                'rgba(153, 102, 255, 1)',
+                'rgba(255, 159, 64, 1)'
+            ],
+            borderWidth: 1
+        }]
+    },
+    options: {
+        scales: {
+            xAxes: [{
+              type: "time",
+              time: {
+                unit: "hour"
+              }
+            }]
+        },
+        legend: {
+          display: false
+        }
+    }
+  });
+
+  var soilHumidityChart = new Chart(soilHumidityCtx, {
+    type: 'line',
+    data: {
+        labels: [{% for item in history %}moment(new Date("{{item[3]}}")),{% endfor %}],
+        datasets: [{
+            label: 'Soil Humidity (%)',
+            data: [{% for item in history %}{{ item[4] | round(precision=3) }},{% endfor %}],
             borderColor: [
                 'rgba(255,99,132,1)',
                 'rgba(54, 162, 235, 1)',
