@@ -1,5 +1,6 @@
 from nose.tools import *
 import random
+import string
 
 from tests import sense, db_conn, db_c
 
